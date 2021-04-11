@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>View Book</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'style.css' %}" />
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <div class="row m-3">
+        <div class="col-md">
+          <h1>Welcome! {{request.session.user_name}}</h1>
+        </div>
+        <div class="col-md-3">
+          <a href="/books/add">Add Book and Review</a><br>
+          <a href="/logout">Logout</a>
+        </div>
+      </div>
+      <div id="messages">
+        {%if messages%}
+        <ul>
+          {%for message in messages%}
+          <li>{{message}}</li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+      </div>
+      <div class="row">
+        <p><h1>{{book.title}}</h1></p>
+        <p><h3>{{book.author}}</h3></p>
+        <p>Uploaded by: <a href="/users/{{book.submitted_by.id}}"> {{book.submitted_by.name}} {{book.submitted_by.alias}} </a></p>
+        <p>Date added: {{book.created_at}}</p>
+        
+        {%for review in reviews %}
+        <p><h4><a href="/users/{{review.reviewer.id}}">{{review.reviewer.name}} {{review.reviewer.alias}}</a> said:</h4></p>
+        <p>Rating: {{review.rating}}</p>
+        <p>{{review.review}}</p>
+        <p>Reviewed on {{review.created_at}}
+        
+        {% if review.reviewer.id == current_user.id %}
+        <a href="/books/confirm_delete_review/{{review.id}}">[delete]</a>
+        {% endif %}
+        </p>
+        {%endfor%}
+      
+        <div id="add">
+            <form action = "{{book.id}}/add_review" method="POST">
+              {%csrf_token%}
+              <p>
+                <textarea name="review" class="form-control" rows="10" cols="30" placeholder="Write your review here"></textarea>
+              </p>
+              <p>
+                <select name="rating" class="form-select form-select-sm">
+                  <option value="none">Select rating</option>
+                  <option value="5">5</option>
+                  <option value="4">4</option>
+                  <option value="3">3</option>
+                  <option value="2">2</option>
+                  <option value="1">1</option>
+                </select>
+                <!-- <input type="hidden" name="book_id" value={{book.id}}> -->
+              </p>
+              <input type = "submit" class="btn btn-primary" value= "Submit Review">
+            </form>
+            </div>
+      </div>
+    </div>
+  </body>
+</html>
